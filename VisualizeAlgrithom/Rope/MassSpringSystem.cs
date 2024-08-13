@@ -16,11 +16,13 @@ namespace Rope
         public Vector2 speed;
         public Vector2 force;
         public Edge edge;//接触的边缘
+        public Vector2 lastpos;
         public MassPoint(float mass, Vector2 position, bool pin)
         {
             this.mass = mass;
             this.position = position;
             this.pin = pin;
+            lastpos = position;
             speed = Vector2.Zero;
             force = Vector2.Zero;
         }
@@ -122,9 +124,9 @@ namespace Rope
         {
             foreach (MassPoint p in massPoints)
             {
-                //重力
+                //重力 f=mg
                 p.force = new Vector2(0, p.mass * 9.8f);
-                //空气阻力
+                //空气阻力 f=-kv
                 p.force = p.force - p.speed * Damping;
             }
 
@@ -134,10 +136,10 @@ namespace Rope
                 MassPoint Pa = massPoints[s.a];
                 MassPoint Pb = massPoints[s.b];
                 Vector2 ab = Pb.position - Pa.position;//a->b
-                //b给a的力
+                //b给a的力 f=k(ab-|ab|) - kd(vb-va)
                 Vector2 Fa = Ks * Vector2.Normalize(ab) * (ab.Length() - s.restLength);
-                //内部阻力
-                Vector2 Fd = Kd * Vector2.Normalize(ab) * MathF.Abs(Vector2.Dot((Pb.speed - Pa.speed), Vector2.Normalize(ab)));
+                //内部阻力 kd(vb-va) 速度在ab方向的投影
+                Vector2 Fd = Kd * Vector2.Normalize(ab) *(MathF.Abs(Vector2.Dot((Pb.speed - Pa.speed), Vector2.Normalize(ab)))+1);
                 Fa = Fa - Fd;
                 //a给b的力
                 Vector2 Fb = Vector2.Zero - Fa;
@@ -156,14 +158,16 @@ namespace Rope
                 }
                 Vector2 acc = p.force / p.mass;//加速度
                 p.speed = p.speed + acc * t; //下一帧的速度
-                Vector2 pos = p.position + p.speed * t;//下一帧的位置
+                //Vector2 pos = p.position + p.speed * t;//下一帧的位置
 
+                Vector2 pos = 2 * p.position - p.lastpos + acc * t * t;//下一帧的位置
                 //边缘求交点
                 for(int i = 0; i < edges.Count - 1; i++)
                 {
                     Vector2 q;
                     if (line2CrossPoint(p.position,pos, edges[i].c, edges[i].d, out q))
                     {
+                        p.lastpos = p.position;
                         p.position = q;
                         p.speed = Vector2.Zero;
                         p.edge = edges[i];
@@ -172,6 +176,7 @@ namespace Rope
                 }
 
                 //没有到边缘
+                p.lastpos = p.position;
                 p.position = pos;
                 
             }

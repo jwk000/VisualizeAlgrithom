@@ -12,9 +12,9 @@ namespace Voronoi
 
         Random randor = new Random();
         //随机30个点R，和30种颜色C，遍历所有像素P，找到P[i]距离R最近的点R[j]，取C[j]作为P[i]的颜色
-        const int N = 30;
-        const int W = 1024;
-        const int H = 768;
+        const int N = 50;
+        const int W = 1920;
+        const int H = 1080;
         Point[] R = new Point[N];
         Color[] C = new Color[N];
         Bitmap bmp = new Bitmap(W, H);
@@ -30,7 +30,7 @@ namespace Voronoi
             this.DoubleBuffered = true;
             this.BackColor = Color.White;
             this.timer1.Tick += OnTick;
-            this.timer1.Interval = 30;
+            this.timer1.Interval = 10;
             this.timer1.Start();
 
         }
