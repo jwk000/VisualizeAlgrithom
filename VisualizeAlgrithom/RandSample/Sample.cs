@@ -25,7 +25,32 @@ namespace RandSample
             return ret;
         }
 
+        //格子采样，把场景划分成mxn个格子，每个格子里随机一个点
+        public List<Point> GridSample(int width, int height, int num)
+        {
+            List<Point> ret = new List<Point>();
+            double dx = Math.Sqrt(width * 1.0 / height * num*2);
+            double dy = 2*num / dx;
+            int x = (int)dx;
+            int y = (int)dy;
+            int w = (int)(width/dx);
+            int h = (int)(height/dy);
+            for(int i = 0; i <= x; i+=2)
+            {
+                int left = i * w;
+                for(int j = 0; j <= y; j+=2)
+                {
+                    int top = j * h;
+                    int rx = left + mRandor.Next(0, w);
+                    int ry = top + mRandor.Next(0, h);
 
+                    ret.Add(new Point(rx,ry));
+                }
+            }
+
+
+            return ret;
+        }
 
         //米切尔采样
         //（1）全屏随机一个点p，找到距离p最近的已采样点q，p和q的距离=d
@@ -40,7 +65,7 @@ namespace RandSample
             {
                 Point p = new Point();
                 int distance = 0;
-                for (int n = 0; n < 30; n++)
+                for (int n = 0; n < 10; n++)
                 {
                     Point c = new Point(mRandor.Next(1, width), mRandor.Next(1, height));
                     int d = FindClosest(ret, c);
@@ -55,10 +80,9 @@ namespace RandSample
             return ret;
         }
 
-        //TODO K-D树优化
+
         int FindClosest(List<Point> samples, Point p)
         {
-            Point closest = samples[0];
             int distance = int.MaxValue;
             foreach (Point q in samples)
             {
@@ -68,7 +92,6 @@ namespace RandSample
                 if (d < distance)
                 {
                     distance = d;
-                    closest = q;
                 }
             }
             return distance;

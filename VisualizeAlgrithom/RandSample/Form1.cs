@@ -65,5 +65,20 @@ namespace RandSample
             Invalidate();
         }
 
+        private void gridSampleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Sample sample = new Sample();
+            var ret = sample.GridSample(ClientRectangle.Width, ClientRectangle.Height, 100);
+
+            mOnPaint = g =>
+            {
+                foreach (var p in ret)
+                {
+                    g.FillRectangle(Brushes.Black, new Rectangle(p, new Size(2, 2)));
+                }
+            };
+
+            Invalidate();
+        }
     }
 }

@@ -29,47 +29,55 @@
         private void InitializeComponent()
         {
             menuStrip1 = new MenuStrip();
-            michellSampleToolStripMenuItem = new ToolStripMenuItem();
             randomSampleToolStripMenuItem = new ToolStripMenuItem();
+            michellSampleToolStripMenuItem = new ToolStripMenuItem();
             poissonDiscSampleToolStripMenuItem = new ToolStripMenuItem();
+            gridSampleToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { randomSampleToolStripMenuItem, michellSampleToolStripMenuItem, poissonDiscSampleToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { randomSampleToolStripMenuItem, michellSampleToolStripMenuItem, poissonDiscSampleToolStripMenuItem, gridSampleToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(800, 25);
+            menuStrip1.Size = new Size(800, 24);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
-            // 
-            // michellSampleToolStripMenuItem
-            // 
-            michellSampleToolStripMenuItem.Name = "michellSampleToolStripMenuItem";
-            michellSampleToolStripMenuItem.Size = new Size(104, 21);
-            michellSampleToolStripMenuItem.Text = "MichellSample";
-            michellSampleToolStripMenuItem.Click += MichellSample_Click;
             // 
             // randomSampleToolStripMenuItem
             // 
             randomSampleToolStripMenuItem.Name = "randomSampleToolStripMenuItem";
-            randomSampleToolStripMenuItem.Size = new Size(112, 21);
+            randomSampleToolStripMenuItem.Size = new Size(103, 20);
             randomSampleToolStripMenuItem.Text = "RandomSample";
             randomSampleToolStripMenuItem.Click += RandomSample_Click;
+            // 
+            // michellSampleToolStripMenuItem
+            // 
+            michellSampleToolStripMenuItem.Name = "michellSampleToolStripMenuItem";
+            michellSampleToolStripMenuItem.Size = new Size(97, 20);
+            michellSampleToolStripMenuItem.Text = "MichellSample";
+            michellSampleToolStripMenuItem.Click += MichellSample_Click;
             // 
             // poissonDiscSampleToolStripMenuItem
             // 
             poissonDiscSampleToolStripMenuItem.Name = "poissonDiscSampleToolStripMenuItem";
-            poissonDiscSampleToolStripMenuItem.Size = new Size(132, 21);
+            poissonDiscSampleToolStripMenuItem.Size = new Size(121, 20);
             poissonDiscSampleToolStripMenuItem.Text = "PoissonDiscSample";
             poissonDiscSampleToolStripMenuItem.Click += PoissonDiscSample_Click;
             // 
+            // gridSampleToolStripMenuItem
+            // 
+            gridSampleToolStripMenuItem.Name = "gridSampleToolStripMenuItem";
+            gridSampleToolStripMenuItem.Size = new Size(80, 20);
+            gridSampleToolStripMenuItem.Text = "GridSample";
+            gridSampleToolStripMenuItem.Click += gridSampleToolStripMenuItem_Click;
+            // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 17F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(800, 397);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
             Name = "Form1";
@@ -86,5 +94,6 @@
         private ToolStripMenuItem michellSampleToolStripMenuItem;
         private ToolStripMenuItem randomSampleToolStripMenuItem;
         private ToolStripMenuItem poissonDiscSampleToolStripMenuItem;
+        private ToolStripMenuItem gridSampleToolStripMenuItem;
     }
 }

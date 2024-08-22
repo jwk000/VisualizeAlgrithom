@@ -1,21 +1,13 @@
 using System.Numerics;
 
-namespace Rope
+namespace RopeNet
 {
     public partial class Form1 : Form
     {
         public Form1()
         {
             InitializeComponent();
-            Init();
-        }
-        MassSpringSystem mssystem = new MassSpringSystem();
-        //Éþ×ÓÄ£Äâ
-        int mDragState = 0;//0Î´ÍÏ×§ 1ÍÏ×§ÖÐ 
-
-        void Init()
-        {
-            mssystem.MakeRope();
+            mssystem.CreateNet();
 
             DoubleBuffered = true;
             ClientSize = new Size(800, 800);
@@ -23,9 +15,13 @@ namespace Rope
             this.timer1.Tick += OnTick;
             this.timer1.Start();
         }
+        MassSpringSystem mssystem = new MassSpringSystem();
+     
+        int mDragState = 0;//0Î´ÍÏ×§ 1ÍÏ×§ÖÐ 
+
         private void OnTick(object? sender, EventArgs e)
         {
-            mssystem.Update(0.1f);
+            mssystem.Update();
             Invalidate();
         }
 
@@ -33,11 +29,17 @@ namespace Rope
         {
             base.OnPaint(e);
             var g = e.Graphics;
-            List<PointF> pts = mssystem.GetPoints().Select(p => new PointF(p.X, p.Y)).ToList();
-            g.DrawLines(Pens.Black, pts.ToArray());
+            List<PointF> pts = mssystem.GetPoints();
+            
             foreach (PointF p in pts)
             {
                 g.FillEllipse(Brushes.Red, new RectangleF(new PointF(p.X - 2, p.Y - 2), new Size(5, 5)));
+                g.DrawEllipse(Pens.Black, new RectangleF(new PointF(p.X - 10, p.Y - 10), new Size(20, 20)));
+            }
+
+            foreach(Spring s in mssystem.GetSprings())
+            {
+                g.DrawLine(Pens.Gray, pts[s.a], pts[s.b]);
             }
         }
 
@@ -66,7 +68,7 @@ namespace Rope
             if (mDragState == 1)
             {
                 mssystem.massPoints[0].position = new Vector2(e.X, e.Y);
-                mssystem.Update(0.1f);
+                mssystem.Update();
             }
         }
     }
