@@ -59,9 +59,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatmullRom", "CatmullRom\Ca
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RandPointTool", "VisualizeAlgrithom\RandPointTool\RandPointTool.csproj", "{A22B104C-143A-4E0C-BAD5-C1A95F5C3EFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RopeNet", "VisualizeAlgrithom\RopeNet\RopeNet.csproj", "{554007F9-C296-4D20-8B44-04CC1FE9BAB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RopeNet", "VisualizeAlgrithom\RopeNet\RopeNet.csproj", "{554007F9-C296-4D20-8B44-04CC1FE9BAB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RopeNet2", "RopeNet2\RopeNet2.csproj", "{FF3B6316-AF8E-4B2B-8D98-51F5ABAEDC4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RopeNet2", "RopeNet2\RopeNet2.csproj", "{FF3B6316-AF8E-4B2B-8D98-51F5ABAEDC4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDF", "SDF\SDF.csproj", "{5A762339-3410-49CE-814A-804437A94F6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -189,6 +191,10 @@ Global
 		{FF3B6316-AF8E-4B2B-8D98-51F5ABAEDC4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF3B6316-AF8E-4B2B-8D98-51F5ABAEDC4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF3B6316-AF8E-4B2B-8D98-51F5ABAEDC4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A762339-3410-49CE-814A-804437A94F6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A762339-3410-49CE-814A-804437A94F6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A762339-3410-49CE-814A-804437A94F6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A762339-3410-49CE-814A-804437A94F6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
