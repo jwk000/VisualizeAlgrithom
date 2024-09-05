@@ -8,67 +8,102 @@ namespace SDF
         public Form1()
         {
             InitializeComponent();
+            Init();
         }
-        const int WIDTH = 256;
-        const int HEIGHT = 256;
+        const int WIDTH = 490;
+        const int HEIGHT = 490;
 
         struct sdPoint
         {
             public int dx, dy;
             public int DistSq() { return dx * dx + dy * dy; }
+            public int Dist() { return (int)Math.Sqrt(DistSq()); }
+        }
+        sdPoint inside = new sdPoint() { dx = 0, dy = 0 };
+        sdPoint empty = new sdPoint() { dx = 1000, dy = 1000 };
+        sdPoint[,] grid1 = new sdPoint[HEIGHT, WIDTH];
+        sdPoint[,] grid2 = new sdPoint[HEIGHT, WIDTH];
+        Bitmap sdf = new Bitmap(WIDTH, HEIGHT);
+
+        void Init()
+        {
+
+            Bitmap a = new Bitmap("./a.jpg");
+            for (int y = 0; y < HEIGHT; y++)
+            {
+                for (int x = 0; x < WIDTH; x++)
+                {
+                    Color px = a.GetPixel(x, y);
+                    if (px.R == 255)
+                    {
+                        grid1[x,y] = inside;
+                        grid2[x,y] = empty;
+                    }
+                    else
+                    {
+                        grid2[x,y] = inside;
+                        grid1[x,y] = empty;
+                    }
+                }
+            }
+
+            // Generate the SDF.
+            GenerateSDF(grid1);
+            GenerateSDF(grid2);
+
+            for (int y = 0; y < HEIGHT; y++)
+            {
+                for (int x = 0; x < WIDTH; x++)
+                {
+                    int red = grid1[x,y].Dist() + grid2[x,y].Dist();
+                    Color c = Color.FromArgb(red, red, red);
+                    sdf.SetPixel(x, y, c);
+                }
+            }
+            
+            Invalidate();
         }
 
-        class sdGrid
+        sdPoint Get(sdPoint[,] g, int x, int y)
         {
-            public sdPoint[,] grid = new sdPoint[WIDTH, HEIGHT];
+            if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT)
+                return empty;
+            return g[x, y];
         }
 
 
-        sdPoint Get(sdGrid g, int x, int y)
+        sdPoint Compare(sdPoint[,] g, sdPoint p, int x, int y, int offsetx, int offsety)
         {
-            // OPTIMIZATION: you can skip the edge check code if you make your grid 
-            // have a 1-pixel gutter.
-            if (x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT)
-                return g.grid[y, x];
-            else
-                return default;
-        }
-
-        void Put(sdGrid g, int x, int y, sdPoint p)
-        {
-            g.grid[y, x] = p;
-        }
-
-        void Compare(sdGrid g, sdPoint p, int x, int y, int offsetx, int offsety)
-        {
-            sdPoint other = Get(g, x + offsetx, y + offsety);
+            sdPoint other = Get(g,x + offsetx, y + offsety);
             other.dx += offsetx;
             other.dy += offsety;
 
             if (other.DistSq() < p.DistSq())
                 p = other;
+
+            return p;
         }
 
-        void GenerateSDF(sdGrid g)
+        void GenerateSDF(sdPoint[,] g)
         {
             // Pass 0
             for (int y = 0; y < HEIGHT; y++)
             {
                 for (int x = 0; x < WIDTH; x++)
                 {
-                    sdPoint p = Get(g, x, y);
-                    Compare(g, p, x, y, -1, 0);
-                    Compare(g, p, x, y, 0, -1);
-                    Compare(g, p, x, y, -1, -1);
-                    Compare(g, p, x, y, 1, -1);
-                    Put(g, x, y, p);
+                    sdPoint p = Get(g,x, y);
+                    p = Compare(g, p, x, y, -1, 0);
+                    p = Compare(g, p, x, y, 0, -1);
+                    p = Compare(g, p, x, y, -1, -1);
+                    p = Compare(g, p, x, y, 1, -1);
+                    g[x, y] = p;
                 }
 
                 for (int x = WIDTH - 1; x >= 0; x--)
                 {
                     sdPoint p = Get(g, x, y);
-                    Compare(g, p, x, y, 1, 0);
-                    Put(g, x, y, p);
+                    p = Compare(g, p, x, y, 1, 0);
+                    g[x, y] = p;
                 }
             }
 
@@ -77,50 +112,29 @@ namespace SDF
             {
                 for (int x = WIDTH - 1; x >= 0; x--)
                 {
-                    sdPoint p = Get(g, x, y);
-                    Compare(g, p, x, y, 1, 0);
-                    Compare(g, p, x, y, 0, 1);
-                    Compare(g, p, x, y, -1, 1);
-                    Compare(g, p, x, y, 1, 1);
-                    Put(g, x, y, p);
+                    sdPoint p = Get(g,x, y);
+                    p = Compare(g, p, x, y, 1, 0);
+                    p = Compare(g, p, x, y, 0, 1);
+                    p = Compare(g, p, x, y, -1, 1);
+                    p = Compare(g, p, x, y, 1, 1);
+                    g[x, y] = p;
                 }
 
                 for (int x = 0; x < WIDTH; x++)
                 {
                     sdPoint p = Get(g, x, y);
-                    Compare(g, p, x, y, -1, 0);
-                    Put(g, x, y, p);
+                    p = Compare(g, p, x, y, -1, 0);
+                    g[x, y] = p;
                 }
             }
         }
 
-        void main()
-        {
-            for (int y = 0; y < HEIGHT; y++)
-            {
-                for (int x = 0; x < WIDTH; x++)
-                {
-                    Uint8 r, g, b;
-                    Uint32* src = ((Uint32*)((Uint8*)temp->pixels + y * temp->pitch)) + x;
-                    SDL_GetRGB(*src, temp->format, &r, &g, &b);
-                    // Points inside get marked with a dx/dy of zero.
-                    // Points outside get marked with an infinitely large distance.
-                    if (g < 128)
-                    {
-                        Put(grid1, x, y, inside);
-                        Put(grid2, x, y, empty);
-                    }
-                    else
-                    {
-                        Put(grid2, x, y, inside);
-                        Put(grid1, x, y, empty);
-                    }
-                }
-            }
 
-            // Generate the SDF.
-            GenerateSDF(grid1);
-            GenerateSDF(grid2);
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            e.Graphics.DrawImage(sdf, 0, 0);
 
         }
     }
