@@ -51,12 +51,12 @@ namespace Boid
         public Vector2 Side;
 
         public float Radius = 10;
-        public float Mass = 10;
+        public float Mass = 1f;
         public float Speed = 10;
         public float TurnRate = 5;
 
-        public float MaxSpeed = 200;
-        public float MaxForce = 200;
+        public float MaxSpeed = 100;
+        public float MaxForce = 400;
         public float MaxTurnRate = 10;
 
         public Vector2 TargetPos;
@@ -100,64 +100,48 @@ namespace Boid
             g.DrawEllipse(MyPen, Pos.X - Radius, Pos.Y - Radius, Radius * 2, Radius * 2);
         }
 
-        Vector2 Trunk(Vector2 v, float m)
+        Vector2 TrunkForce(Vector2 v)
         {
-            if(v.Length()<m)
+            if (v.Length() < MaxForce)
             {
                 return v;
             }
-      
-            return Vector2.Normalize(v) * m;
+
+            return Vector2.Normalize(v) * MaxForce;
         }
 
         Vector2 CalcForce(float timeElapsed)
         {
-            if (Behavior == EBehavior.Idle)
-            {
-                return Vector2.Zero;
-            }
             Vector2 force = Vector2.Zero;
-            if (Behavior==(EBehavior.Wander))
+            switch (Behavior)
             {
-                force += Wander();
-                force = Trunk(force, MaxForce);
+                case EBehavior.Wander:
+                    force += Wander();
+                    break;
+                case EBehavior.Flee:
+                    force += Flee(TargetPos);
+                    break;
+                case EBehavior.Seek:
+                    force += Seek(TargetPos);
+                    break;
+                case EBehavior.Arrive:
+                    force += Arrive(TargetPos);
+                    break;
+                case EBehavior.Pursuit:
+                    force += Pursuit(TargetAgent);
+                    break;
+                case EBehavior.Evade:
+                    force += Evade(TargetAgent);
+                    break;
+                case EBehavior.Boids:
+                    force += Boids();
+                    break;
+                default:
+                    break;
             }
+            force = TrunkForce(force);
 
-            if (Behavior==(EBehavior.Flee))
-            {
-                force += Flee(TargetPos);
-                force = Trunk(force, MaxForce);
-            }
-
-            if (Behavior==(EBehavior.Seek))
-            {
-                force += Seek(TargetPos);
-                force = Trunk(force, MaxForce);
-            }
-
-            if (Behavior==(EBehavior.Arrive))
-            {
-                force += Arrive(TargetPos);
-                force = Trunk(force, MaxForce);
-            }
-
-            if (Behavior==(EBehavior.Pursuit))
-            {
-                force += Pursuit(TargetAgent);
-                force = Trunk(force, MaxForce);
-            }
-
-            if (Behavior==(EBehavior.Evade))
-            {
-                force += Evade(TargetAgent);
-                force = Trunk(force, MaxForce);
-            }
-
-            if(Behavior==(EBehavior.Boids))
-            {
-                force += Boids();
-                force = Trunk(force, MaxForce);
-            }
+            force *= 0.75f; //阻力
             return force;
         }
 
@@ -195,7 +179,7 @@ namespace Boid
         //追赶
         Vector2 Pursuit(Vehicle vehicle)
         {
-            if(vehicle == null)
+            if (vehicle == null)
             {
                 return Vector2.Zero;
             }
@@ -234,9 +218,11 @@ namespace Boid
             //分离
             foreach (var vehicle in vehiclesInView)
             {
-                if (vehicle != this && (vehicle.Pos - Pos).Length() < Radius * 3)
+                Vector2 v =Pos - vehicle.Pos;
+                if (vehicle != this && v.Length() < Radius * 3)
                 {
-                    force += Flee(vehicle.Pos);
+                    Vector2 F = Vector2.Normalize(v) * MathF.Pow(Radius * 3 - v.Length(), 4);
+                    force += F;
                 }
             }
             //对齐
@@ -251,7 +237,7 @@ namespace Boid
             if (avgVelocity.Length() > 0)
             {
                 avgVelocity /= vehiclesInView.Count;
-                force += Trunk(avgVelocity - Velocity, MaxForce);
+                force += TrunkForce(avgVelocity - Velocity);
             }
             //聚合
             Vector2 centerOfMass = Vector2.Zero;
@@ -268,7 +254,9 @@ namespace Boid
                 force += Seek(centerOfMass);
             }
 
-            force += Seek(TargetPos);
+            Vector2 vt = TargetPos - Pos;
+            vt = Vector2.Normalize(vt) * MathF.Pow(vt.Length(),4);
+            force += TrunkForce(vt);
             return force;
         }
 
@@ -277,23 +265,20 @@ namespace Boid
     class GameWorld
     {
         public static GameWorld Instance = new GameWorld();
-        public GameWorld()
-        {
-            CreateWorld();
-        }
+
         public List<Vehicle> Vehicles = new List<Vehicle>();
         public List<Wall> Walls = new List<Wall>();
         public Random Randor = new Random();
         public int m_ID = 0;
-        public int Width = 1920;
-        public int Height = 1080;
+        public int Width = 0;
+        public int Height = 0;
 
         public Vehicle SelectVehicle = null;
         public EBehavior GlobalBehavior = EBehavior.Idle;
 
         public void CreateWorld()
         {
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 10; i++)
             {
                 Vehicle v = new Vehicle();
                 v.Id = ++m_ID;
@@ -352,7 +337,7 @@ namespace Boid
 
         public void SelectAgent(Vector2 pos)
         {
-            
+
             foreach (var vehicle in Vehicles)
             {
                 if ((vehicle.Pos - pos).Length() < vehicle.Radius * 2)
@@ -362,7 +347,7 @@ namespace Boid
                 }
             }
 
-            if(SelectVehicle == null)
+            if (SelectVehicle == null)
             {
                 return;
             }

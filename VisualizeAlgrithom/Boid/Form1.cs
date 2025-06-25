@@ -13,6 +13,7 @@ namespace Boid
             BackColor = Color.Black;
             GameWorld.Instance.Width = this.ClientSize.Width;
             GameWorld.Instance.Height = this.ClientSize.Height;
+            GameWorld.Instance.CreateWorld();
 
             timer1.Interval = 16;
             timer1.Tick += (s, e) => this.Invalidate();
